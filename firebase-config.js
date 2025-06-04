@@ -1,13 +1,10 @@
-// ضع إعدادات مشروعك من Firebase هنا
+// Firebase Configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "XXXXXXX",
-  appId: "APP_ID"
+  apiKey: "AIzaSyB3bBsR5j6CHYaXkrIIF_g4ZvWGYd3WTiQ",
+  authDomain: "mr-piip-pro.firebaseapp.com",
+  projectId: "mr-piip-pro",
+  storageBucket: "mr-piip-pro.firebasestorage.app",
+  messagingSenderId: "826519029119",
+  appId: "1:826519029119:web:548c3298af3b20f370464a",
+  measurementId: "G-MQ3QVBXJS4"
 };
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
