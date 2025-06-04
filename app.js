@@ -1,54 +1,43 @@
-const provider = new firebase.auth.GoogleAuthProvider();
+// app.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { firebaseConfig } from './firebase-config.js';
 
-function login() {
-  auth.signInWithPopup(provider)
-    .then(result => {
-      const user = result.user;
-      document.getElementById("user-info").textContent = `مرحبًا، ${user.displayName}`;
-      getTools();
-    })
-    .catch(console.error);
-}
+// تهيئة Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-function logout() {
-  auth.signOut().then(() => {
-    document.getElementById("user-info").textContent = "تم تسجيل الخروج";
-    document.getElementById("tools-container").innerHTML = "";
-  });
-}
-
-function addTool() {
-  const name = document.getElementById("tool-name").value;
-  const link = document.getElementById("tool-link").value;
-  const user = auth.currentUser;
-
-  if (user && name && link) {
-    db.collection("tools").add({
-      name: name,
-      link: link,
-      email: user.email,
-      created: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      document.getElementById("tool-name").value = "";
-      document.getElementById("tool-link").value = "";
-    });
-  }
-}
-
+// تحميل الأدوات من Firestore
 function getTools() {
-  db.collection("tools").orderBy("created", "desc").onSnapshot(snapshot => {
-    const container = document.getElementById("tools-container");
-    container.innerHTML = "";
-    snapshot.forEach(doc => {
-      const tool = doc.data();
-      container.innerHTML += `<div><a href="${tool.link}" target="_blank">${tool.name}</a></div>`;
+  const toolsContainer = document.getElementById("tools-container");
+  toolsContainer.innerHTML = "<p>جاري تحميل الأدوات...</p>";
+
+  const toolsQuery = query(collection(db, "tools"), orderBy("added_at", "desc"));
+
+  getDocs(toolsQuery)
+    .then(snapshot => {
+      toolsContainer.innerHTML = "";
+      if (snapshot.empty) {
+        toolsContainer.innerHTML = "<p>لا توجد أدوات متاحة حالياً.</p>";
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const tool = doc.data();
+        const div = document.createElement('div');
+        div.className = 'tool-card';
+        div.innerHTML = `
+          <h3>${tool.name}</h3>
+          <a href="${tool.link}" target="_blank">تحميل</a>
+        `;
+        toolsContainer.appendChild(div);
+      });
+    })
+    .catch(error => {
+      console.error("حدث خطأ أثناء تحميل الأدوات:", error);
+      toolsContainer.innerHTML = "<p>حدث خطأ، حاول لاحقاً.</p>";
     });
-  });
 }
 
-auth.onAuthStateChanged(user => {
-  if (user) {
-    document.getElementById("user-info").textContent = `مرحبًا، ${user.displayName}`;
-    getTools();
-  }
-});
+// تحميل الأدوات عند تشغيل الصفحة
+getTools();
