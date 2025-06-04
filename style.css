@@ -1,0 +1,29 @@
+body {
+  font-family: sans-serif;
+  direction: rtl;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+header {
+  background-color: #008cff;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+button {
+  margin: 10px 5px;
+  padding: 10px;
+  background-color: #00c957;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+input {
+  margin: 5px;
+  padding: 10px;
+  width: 300px;
+}
