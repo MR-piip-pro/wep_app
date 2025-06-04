@@ -16,6 +16,7 @@
   <main>
     <section id="tools-list" class="tools-container">
       <!-- الأدوات تُعرض هنا تلقائيًا -->
+      <p>جاري التحميل...</p>
     </section>
   </main>
 
@@ -23,37 +24,43 @@
     <p>حقوق النشر © 2025 - متجر أدوات MR-PIIP_PRO</p>
   </footer>
 
-  <!-- Firebase Scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+  <!-- Firebase Modules -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { firebaseConfig } from './firebase-config.js';
 
-  <!-- Firebase Config -->
-  <script src="firebase-config.js"></script>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  <!-- تطبيق قراءة الأدوات -->
-  <script>
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(app);
     const toolsContainer = document.getElementById('tools-list');
+    toolsContainer.innerHTML = ""; // إزالة "جاري التحميل..."
 
-    db.collection("tools").orderBy("added_at", "desc").get()
+    const q = query(collection(db, "tools"), orderBy("added_at", "desc"));
+
+    getDocs(q)
       .then(snapshot => {
+        if (snapshot.empty) {
+          toolsContainer.innerHTML = "<p>لا توجد أدوات حالياً.</p>";
+          return;
+        }
+
         snapshot.forEach(doc => {
           const tool = doc.data();
           const div = document.createElement('div');
           div.className = 'tool-card';
           div.innerHTML = `
             <h2>${tool.name}</h2>
-            <a href="${tool.link}" target="_blank">تحميل</a>
+            <a href="${tool.link}" target="_blank">📥 تحميل الأداة</a>
           `;
           toolsContainer.appendChild(div);
         });
       })
       .catch(error => {
         console.error("فشل في جلب الأدوات:", error);
+        toolsContainer.innerHTML = "<p>حدث خطأ أثناء تحميل الأدوات.</p>";
       });
   </script>
 
 </body>
 </html>
-
